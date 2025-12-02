@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Register</h2>
+<form method="post">
+  <label>Email <input name="email" required></label><br>
+  <label>Password <input name="password" type="password" required></label><br>
+  <label>Role
+    <select name="role" id="role_select">
+      <option value="client">Client</option>
+      <option value="agent">Agent</option>
+    </select>
+  </label><br>
+  <div id="agent_code_wrap" style="display:none;">
+    <label>Agent Code <input name="agent_code" /></label><br>
+  </div>
+  <button type="submit">Register</button>
+</form>
+
+<script>
+document.getElementById('role_select').addEventListener('change', function(){
+  document.getElementById('agent_code_wrap').style.display = this.value === 'agent' ? 'block' : 'none';
+});
+</script>
+{% endblock %}

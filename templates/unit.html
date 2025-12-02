@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ unit.name }}</title>
+</head>
+<body>
+    <h1>{{ unit.name }}</h1>
+    <p>Status: {{ unit.status }}</p>
+    <img src="{{ url_for('static', filename=unit.floorplan_image) }}" alt="Floor Plan" style="max-width:400px;"><br><br>
+
+    <h3>Price Calculator</h3>
+    <label><input type="checkbox" id="garage"> Garage (+50,000)</label><br>
+    <label><input type="checkbox" id="landscaping"> Landscaping (+20,000)</label><br>
+    <label><input type="checkbox" id="premium_finish"> Premium Finish (+8%)</label><br>
+    <p>Total Price: <span id="total-price">{{ unit.base_price }}</span></p>
+
+    <button id="tourBtn" data-tour-url="{{ unit.tour_url | default('#') }}">View House Tour</button>
+
+    <script>
+    const btn = document.getElementById('tourBtn');
+    btn.addEventListener('click', function () {
+        const url = this.dataset.tourUrl;
+        if (url !== '#') window.open(url, '_blank');
+    });
+
+    const inputs = ['garage','landscaping','premium_finish'].map(id => document.getElementById(id));
+    const totalEl = document.getElementById('total-price');
+
+    function computePrice() {
+        const extras = {
+            garage: inputs[0].checked,
+            landscaping: inputs[1].checked,
+            premium_finish: inputs[2].checked
+        };
+
+        fetch('/compute_price/{{ unit.id }}', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({extras})
+        })
+        .then(r=>r.json())
+        .then(data=>{ totalEl.textContent = data.total.toLocaleString(); });
+    }
+
+    inputs.forEach(input => input.addEventListener('change', computePrice));
+    </script>
+</body>
+</html>
